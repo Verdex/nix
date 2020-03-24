@@ -1,8 +1,8 @@
 
-mod top_level;
+mod parse;
 
 fn main() {
-    use top_level::data::Token;
+    use parse::data::Token;
 
     let _x : Token = Token::Use;
     println!("Hello, world!");
