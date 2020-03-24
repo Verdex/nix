@@ -1,3 +1,3 @@
 
 pub mod data;
-pub mod parser;
+mod top_level_parser;

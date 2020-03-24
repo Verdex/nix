@@ -1,4 +1,0 @@
-
-pub enum Token {
-    Use,
-}
