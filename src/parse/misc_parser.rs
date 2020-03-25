@@ -12,7 +12,6 @@ pub fn clear_whitespace( mut input : &[char] ) -> &[char] {
 }
 
 pub fn parse_symbol( mut input : &[char] ) -> Result<(Symbol, &[char]), String> {
-    input = clear_whitespace(input);
 
     let mut ret : Vec<char> = vec![];
     
@@ -52,13 +51,6 @@ mod Test {
     #[test]
     fn should_parse_symbol() {
         let input = "symbol ".chars().collect::<Vec<char>>();
-        let (sym, _) = parse_symbol(&input).unwrap();
-        assert_eq!( sym.value, "symbol".to_string()  );
-    }
-
-    #[test]
-    fn should_parse_symbol_with_prefixed_whitespace() {
-        let input = "   \nsymbol ".chars().collect::<Vec<char>>();
         let (sym, _) = parse_symbol(&input).unwrap();
         assert_eq!( sym.value, "symbol".to_string()  );
     }
