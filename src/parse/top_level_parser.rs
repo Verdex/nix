@@ -1,5 +1,6 @@
 
 use super::ast::*;
+use super::misc_parser::{clear_whitespace, expect, parse_symbol};
 
 pub fn parse( input : &str ) -> Result<Module, String> {
     fn p( mut input : &[char] ) -> Result<Module, String> {
@@ -35,6 +36,8 @@ pub fn parse( input : &str ) -> Result<Module, String> {
 }
 
 fn parse_use( input : &[char] ) -> Result<(Use, &[char]), String> {
+    let (sym, mut input) = parse_symbol( input )?;
+    input = expect( input, "::" )?;
     Err("blah".to_string())
 }
 
