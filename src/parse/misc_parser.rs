@@ -17,7 +17,7 @@ pub fn parse_symbol( mut input : &[char] ) -> Result<(Symbol, &[char]), String> 
     let mut ret : Vec<char> = vec![];
     
     match input {
-        [] => return Err( "blah 1".to_string() ),
+        [] => return Err( "Expected symbol found end of file".to_string() ),
         [x, rest @ ..] if x.is_alphabetic() => {
             ret.push(*x);
             input = rest
@@ -26,12 +26,12 @@ pub fn parse_symbol( mut input : &[char] ) -> Result<(Symbol, &[char]), String> 
             ret.push('_');
             input = rest
         },
-        _ => return Err( "blah 2".to_string() ), 
+        _ => return Err( "Encountered non symbol character".to_string() ), 
     }
 
     loop {
         match input {
-            [] => return Err( "blah 3".to_string() ),
+            [] => return Err( "Expected symbol found end of file".to_string() ),
             [x, rest @ ..] if x.is_alphanumeric() => {
                 ret.push(*x);
                 input = rest
