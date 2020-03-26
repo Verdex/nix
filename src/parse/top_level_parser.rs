@@ -36,8 +36,32 @@ pub fn parse( input : &str ) -> Result<Module, String> {
 }
 
 fn parse_use( mut input : &[char] ) -> Result<(Use, &[char]), String> {
-    fn parse_imports( input : &[char] ) -> Result<(Vec<Import>, &[char]), String> {
-        Err( "blah".to_string() )
+    fn parse_imports( mut input : &[char] ) -> Result<(Vec<Import>, &[char]), String> {
+        let mut imports = vec![];
+
+        input = expect( input, "{" )?;
+        loop {
+            input = clear_whitespace( input );
+            match input {
+                [] => return Err( "Expected import list; found end of file".to_string() ),
+                [x, ..] if x.is_alphanumeric() || *x == '_' => {
+                    let (sym, new_input) = parse_symbol( input )?;
+                    imports.push( Import::Single( sym.value ) );
+                    input = new_input;
+                },
+                ['*', rest @ ..] => {
+                    imports.push(Import::Everything);
+                    input = rest;
+                },
+                _ => break,
+            }
+            input = clear_whitespace( input );
+            input = expect( input, "," )?;
+        }
+        input = clear_whitespace( input );
+        input = expect( input, "}" )?;
+
+        Ok( (imports, input) )
     }
 
     let mut module_name = vec![];
@@ -54,7 +78,6 @@ fn parse_use( mut input : &[char] ) -> Result<(Use, &[char]), String> {
         }
         input = clear_whitespace( input );
     }
-    input = expect( input, "{" )?;
     let (imports, new_input) = parse_imports( input )?; 
     
     Ok( (Use { module_name, imports }, new_input) )
