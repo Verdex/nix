@@ -35,10 +35,29 @@ pub fn parse( input : &str ) -> Result<Module, String> {
     p(&input.chars().collect::<Vec<char>>())
 }
 
-fn parse_use( input : &[char] ) -> Result<(Use, &[char]), String> {
-    let (sym, mut input) = parse_symbol( input )?;
-    input = expect( input, "::" )?;
-    Err("blah".to_string())
+fn parse_use( mut input : &[char] ) -> Result<(Use, &[char]), String> {
+    fn parse_imports( input : &[char] ) -> Result<(Vec<Import>, &[char]), String> {
+        Err( "blah".to_string() )
+    }
+
+    let mut module_name = vec![];
+
+    input = clear_whitespace( input );
+    loop {
+        let (sym, new_input) = parse_symbol( input )?;
+        module_name.push(sym);
+        input = clear_whitespace( new_input );
+        let delimiter_result = expect( input, "::" );
+        match delimiter_result {
+            Ok( new_input ) => input = new_input,
+            Err(_) => break,
+        }
+        input = clear_whitespace( input );
+    }
+    input = expect( input, "{" )?;
+    let (imports, new_input) = parse_imports( input )?; 
+    
+    Ok( (Use { module_name, imports }, new_input) )
 }
 
 fn parse_type( input : &[char] ) -> Result<(Type, &[char]), String> {

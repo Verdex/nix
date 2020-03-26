@@ -18,11 +18,18 @@ pub enum Fun {
 }
 
 #[derive(Debug)]
-pub enum Use {
-
+pub struct Use {
+    pub module_name : Vec<Symbol>,
+    pub imports : Vec<Import>,
 }
 
 #[derive(Debug)]
 pub struct Symbol {
     pub value : String,
+}
+
+#[derive(Debug)]
+pub enum Import {
+    Everything,
+    Single(String),
 }
