@@ -53,10 +53,14 @@ fn parse_use( mut input : &[char] ) -> Result<(Use, &[char]), String> {
                     imports.push(Import::Everything);
                     input = rest;
                 },
-                _ => break,
+                [x, ..] => return Err( format!( "Expected import item, but found {}", x ) ),
             }
             input = clear_whitespace( input );
-            input = expect( input, "," )?;
+            let expect_result = expect( input, "," );
+            match expect_result {
+                Ok( new_input ) => input = new_input,
+                Err(_) => break,
+            }
         }
         input = clear_whitespace( input );
         input = expect( input, "}" )?;
@@ -68,19 +72,22 @@ fn parse_use( mut input : &[char] ) -> Result<(Use, &[char]), String> {
 
     input = clear_whitespace( input );
     loop {
-        let (sym, new_input) = parse_symbol( input )?;
-        module_name.push(sym);
-        input = clear_whitespace( new_input );
-        let delimiter_result = expect( input, "::" );
-        match delimiter_result {
-            Ok( new_input ) => input = new_input,
+        match parse_symbol( input ) {
+            Ok( (sym, new_input) ) => {
+                module_name.push(sym);
+                input = new_input;
+            },
             Err(_) => break,
         }
         input = clear_whitespace( input );
+        input = expect( input, "::" )?;
+        input = clear_whitespace( input );
     }
     let (imports, new_input) = parse_imports( input )?; 
+
+    input = expect( new_input, ";" )?;
     
-    Ok( (Use { module_name, imports }, new_input) )
+    Ok( (Use { module_name, imports }, input) )
 }
 
 fn parse_type( input : &[char] ) -> Result<(Type, &[char]), String> {
@@ -89,4 +96,24 @@ fn parse_type( input : &[char] ) -> Result<(Type, &[char]), String> {
 
 fn parse_fun( input : &[char] ) -> Result<(Fun, &[char]), String> {
     Err("blah".to_string())
+}
+
+#[cfg(test)]
+mod Test {
+    use super::*;
+
+    #[test]
+    fn should_parse_simple_use() {
+        let input = "some_module::{*};".chars().collect::<Vec<char>>();
+        let (use_statement, new_input) = parse_use(&input).unwrap();
+        
+        assert_eq!( use_statement.module_name.len(), 1 );
+        assert_eq!( use_statement.module_name[0].value, "some_module" );
+
+        assert_eq!( use_statement.imports.len(), 1 );
+        assert_eq!( matches!( use_statement.imports[0], Import::Everything ), true );
+
+        assert_eq!( new_input.iter().collect::<String>(), "" );
+    }
+     
 }
