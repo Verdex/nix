@@ -115,5 +115,21 @@ mod Test {
 
         assert_eq!( new_input.iter().collect::<String>(), "" );
     }
+
+    #[test]
+    fn should_parse_use_with_multiple_names() {
+        let input = "some_path::some_other_path::module_name::{*};".chars().collect::<Vec<char>>();
+        let (use_statement, new_input) = parse_use(&input).unwrap();
+        
+        assert_eq!( use_statement.module_name.len(), 3 );
+        assert_eq!( use_statement.module_name[0].value, "some_path" );
+        assert_eq!( use_statement.module_name[1].value, "some_other_path" );
+        assert_eq!( use_statement.module_name[2].value, "module_name" );
+
+        assert_eq!( use_statement.imports.len(), 1 );
+        assert_eq!( matches!( use_statement.imports[0], Import::Everything ), true );
+
+        assert_eq!( new_input.iter().collect::<String>(), "" );
+    }
      
 }
