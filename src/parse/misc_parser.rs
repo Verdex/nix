@@ -36,7 +36,7 @@ pub fn parse_symbol( mut input : &[char] ) -> Result<(Symbol, &[char]), String> 
             ret.push('_');
             input = rest
         },
-        _ => return Err( "Encountered non symbol character".to_string() ), 
+        [x, ..] => return Err( format!("Encountered non symbol character: {}", x) ), 
     }
 
     loop {
